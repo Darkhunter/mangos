@@ -285,8 +285,8 @@ void Group::SpoofGroupMemberFactions(Player* playerRemoved)
 				if(Pet* pet = member->GetPet())
 					pet->SendCreateUpdateToPlayer(player);			// update member's pet's faction
 
-				for(uint8 i = 0; i < MAX_TOTEM; ++i)
-					if(Unit* totem = (Unit*)member->GetTotem(i))
+				for(uint8 i = 0; i < MAX_TOTEM_SLOT; ++i)
+                    if(Unit* totem = (Unit*)member->GetTotem((TotemSlot)i))
 						totem->SendCreateUpdateToPlayer(player);	// update member's totems' factions
 			}
 
@@ -297,8 +297,8 @@ void Group::SpoofGroupMemberFactions(Player* playerRemoved)
 				if(Pet* pet = playerRemoved->GetPet())
 					pet->SendCreateUpdateToPlayer(player);
 
-				for(uint8 i = 0; i < MAX_TOTEM; ++i)
-					if(Unit* totem = (Unit*)playerRemoved->GetTotem(i))
+				for(uint8 i = 0; i < MAX_TOTEM_SLOT; ++i)
+                    if(Unit* totem = (Unit*)playerRemoved->GetTotem((TotemSlot)i))
 						totem->SendCreateUpdateToPlayer(player);
 
 				player->SendCreateUpdateToPlayer(playerRemoved);
@@ -306,8 +306,8 @@ void Group::SpoofGroupMemberFactions(Player* playerRemoved)
 				if(Pet* pet = player->GetPet())
 					pet->SendCreateUpdateToPlayer(playerRemoved);
 
-				for(uint8 i = 0; i < MAX_TOTEM; ++i)
-					if(Unit* totem = (Unit*)player->GetTotem(i))
+				for(uint8 i = 0; i < MAX_TOTEM_SLOT; ++i)
+                    if(Unit* totem = (Unit*)player->GetTotem((TotemSlot)i))
 						totem->SendCreateUpdateToPlayer(playerRemoved);
 			}
 		}
