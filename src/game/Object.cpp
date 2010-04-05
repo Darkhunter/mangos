@@ -45,6 +45,8 @@
 
 #include "TemporarySummon.h"
 
+#include "Config/ConfigEnv.h"
+
 uint32 GuidHigh2TypeId(uint32 guid_hi)
 {
     switch(guid_hi)
@@ -657,6 +659,52 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     else
                         *data << (m_uint32Values[ index ] & ~UNIT_DYNFLAG_TAPPED);
                 }
+				else if( index == UNIT_FIELD_FACTIONTEMPLATE && target != this)
+				{
+					bool set = false;
+					if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP) || sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_FAKEFACTION))
+					{
+						bool player = false;
+						bool petOfPlayer = false;
+						bool charmedByPlayer = false;
+
+						Player* owner;
+						Player* targetOwner = target->GetOwner() && target->GetOwner()->GetTypeId() == TYPEID_PLAYER ? (Player*)target->GetOwner() : target;
+
+						if(GetTypeId() == TYPEID_PLAYER)
+							player = true;
+
+						if(!player && GetTypeId() == TYPEID_UNIT)
+						{
+							Creature* creature = (Creature*)this;
+
+							if(creature->GetOwner() && creature->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+							{
+								if(creature->isPet() || creature->isTotem())
+									petOfPlayer = true;
+								else if(creature->isCharmed())
+									charmedByPlayer = true;
+
+								owner = (Player*)creature->GetOwner();
+							}
+						}
+
+						if(player || petOfPlayer || charmedByPlayer)
+						{
+							Player* player = owner ? owner : (Player*)this;
+							
+							if(player != targetOwner)
+								if((player->GetGroup() && targetOwner->GetGroup() && player->GetGroup() == targetOwner->GetGroup()) || sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_FAKEFACTION))
+								{
+									*data << target->GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE);
+									set = true;
+								}
+						}
+					}
+					
+					if(!set)
+						*data << m_uint32Values[ index ];
+				}
                 else
                 {
                     // send in current format (float as float, uint32 as uint32)
