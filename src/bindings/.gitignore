@@ -14,3 +14,6 @@
 #
 */
 !universal/
+!scriptdev2/
+!scriptdev2/*
+!scriptdev2/.svn/*
